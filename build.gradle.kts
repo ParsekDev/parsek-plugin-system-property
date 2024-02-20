@@ -23,10 +23,10 @@ repositories {
 dependencies {
     if (bootstrap) {
         compileOnly(project(mapOf("path" to ":Parsek")))
-        compileOnly(project(mapOf("path" to ":plugins:database")))
+        compileOnly(project(mapOf("path" to ":plugins:parsek-plugin-database")))
     } else {
         compileOnly("com.github.StatuParsek:Parsek:main-SNAPSHOT")
-        compileOnly("com.github.StatuParsek:parsek-database:main-SNAPSHOT")
+        compileOnly("com.github.StatuParsek:parsek-plugin-database:main-SNAPSHOT")
     }
 
     compileOnly(kotlin("stdlib-jdk8"))
@@ -88,8 +88,8 @@ tasks {
 publishing {
     repositories {
         maven {
-            name = "parsek-system-property"
-            url = uri("https://maven.pkg.github.com/StatuParsek/parsek-system-property")
+            name = "parsek-plugin-system-property"
+            url = uri("https://maven.pkg.github.com/StatuParsek/parsek-plugin-system-property")
             credentials {
                 username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME_GITHUB")
                 password = project.findProperty("gpr.token") as String? ?: System.getenv("TOKEN_GITHUB")
@@ -100,7 +100,7 @@ publishing {
     publications {
         create<MavenPublication>("shadow") {
             project.extensions.configure<com.github.jengelman.gradle.plugins.shadow.ShadowExtension> {
-                artifactId = "parsek-system-property-plugin"
+                artifactId = "parsek-plugin-system-property"
                 component(this@create)
             }
         }
