@@ -12,10 +12,16 @@ class DatabaseEventHandler : DatabaseEventListener {
     }
 
     override suspend fun onReady(databaseManager: DatabaseManager) {
+        databaseManager.migrateNewPluginId(
+            "system-property",
+            SystemPropertyPlugin.INSTANCE.context.pluginId,
+            SystemPropertyPlugin.INSTANCE
+        )
+
         databaseManager.initialize(
             SystemPropertyPlugin.INSTANCE,
             SystemPropertyPlugin.tables,
-            SystemPropertyPlugin.migrations
+            SystemPropertyPlugin.migrations,
         )
 
         val handlers =
