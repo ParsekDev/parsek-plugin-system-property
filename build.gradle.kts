@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.internal.KaptTask
+
 plugins {
     kotlin("jvm") version "1.9.20"
     kotlin("kapt") version "1.9.20"
@@ -43,6 +45,12 @@ tasks.named("jar").configure {
     enabled = false
 }
 
+tasks.withType<KaptTask> {
+    if (bootstrap) {
+        mustRunAfter(":plugins:parsek-plugin-database:shadowJar")
+    }
+}
+
 tasks {
     shadowJar {
         val pluginId: String by project
@@ -81,7 +89,9 @@ tasks {
 
     build {
         dependsOn(shadowJar)
-        dependsOn("copyJar")
+        doLast {
+            dependsOn("copyJar")
+        }
     }
 }
 
