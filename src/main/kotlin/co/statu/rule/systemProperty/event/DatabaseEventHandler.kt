@@ -1,34 +1,19 @@
 package co.statu.rule.systemProperty.event
 
-import co.statu.rule.database.Dao.Companion.get
+import co.statu.parsek.api.annotation.EventListener
 import co.statu.rule.database.DatabaseManager
 import co.statu.rule.database.event.DatabaseEventListener
 import co.statu.rule.systemProperty.SystemPropertyPlugin
-import co.statu.rule.systemProperty.db.dao.SystemPropertyDao
 
-class DatabaseEventHandler : DatabaseEventListener {
-    private val systemPropertyDao by lazy {
-        get<SystemPropertyDao>(SystemPropertyPlugin.tables)
-    }
-
+@EventListener
+class DatabaseEventHandler(private val systemPropertyPlugin: SystemPropertyPlugin) : DatabaseEventListener {
     override suspend fun onReady(databaseManager: DatabaseManager) {
         databaseManager.migrateNewPluginId(
             "system-property",
-            SystemPropertyPlugin.INSTANCE.context.pluginId,
-            SystemPropertyPlugin.INSTANCE
+            systemPropertyPlugin.pluginId,
+            systemPropertyPlugin
         )
 
-        databaseManager.initialize(
-            SystemPropertyPlugin.INSTANCE,
-            SystemPropertyPlugin.tables,
-            SystemPropertyPlugin.migrations,
-        )
-
-        val handlers =
-            SystemPropertyPlugin.INSTANCE.context.pluginEventManager.getEventHandlers<SystemPropertyListener>()
-
-        handlers.forEach {
-            it.onReady(systemPropertyDao)
-        }
+        databaseManager.initialize(systemPropertyPlugin, systemPropertyPlugin)
     }
 }
