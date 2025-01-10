@@ -8,12 +8,6 @@ import co.statu.rule.systemProperty.SystemPropertyPlugin
 @EventListener
 class DatabaseEventHandler(private val systemPropertyPlugin: SystemPropertyPlugin) : DatabaseEventListener {
     override suspend fun onReady(databaseManager: DatabaseManager) {
-        databaseManager.migrateNewPluginId(
-            "system-property",
-            systemPropertyPlugin.pluginId,
-            systemPropertyPlugin
-        )
-
         databaseManager.initialize(systemPropertyPlugin, systemPropertyPlugin)
     }
 }
