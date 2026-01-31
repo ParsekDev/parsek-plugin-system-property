@@ -5,14 +5,15 @@ import co.statu.rule.systemProperty.SystemPropertyDefaults
 import co.statu.rule.systemProperty.db.dao.SystemPropertyDao
 import co.statu.rule.systemProperty.db.model.SystemProperty
 import io.vertx.jdbcclient.JDBCPool
-import io.vertx.kotlin.coroutines.await
+import io.vertx.sqlclient.Pool
+import io.vertx.kotlin.coroutines.*
 import io.vertx.sqlclient.Row
 import io.vertx.sqlclient.RowSet
 import io.vertx.sqlclient.Tuple
 
 class SystemPropertyDaoImpl : SystemPropertyDao() {
 
-    override suspend fun init(jdbcPool: JDBCPool, plugin: ParsekPlugin) {
+    override suspend fun init(jdbcPool: Pool, plugin: ParsekPlugin) {
         jdbcPool
             .query(
                 """
@@ -24,14 +25,14 @@ class SystemPropertyDaoImpl : SystemPropertyDao() {
                     """
             )
             .execute()
-            .await()
+            .coAwait()
 
         addWebsiteConfig(jdbcPool)
     }
 
     override suspend fun add(
         systemProperty: SystemProperty,
-        jdbcPool: JDBCPool
+        jdbcPool: Pool
     ) {
         val query = "INSERT INTO `${getTablePrefix() + tableName}` (`id`, `option`, `value`) VALUES (?, ?, ?)"
 
@@ -44,12 +45,12 @@ class SystemPropertyDaoImpl : SystemPropertyDao() {
                     systemProperty.value
                 )
             )
-            .await()
+            .coAwait()
     }
 
     override suspend fun update(
         systemProperty: SystemProperty,
-        jdbcPool: JDBCPool
+        jdbcPool: Pool
     ) {
         val params = Tuple.tuple()
 
@@ -68,13 +69,13 @@ class SystemPropertyDaoImpl : SystemPropertyDao() {
             .execute(
                 params
             )
-            .await()
+            .coAwait()
     }
 
 
     override suspend fun isPropertyExists(
         systemProperty: SystemProperty,
-        jdbcPool: JDBCPool
+        jdbcPool: Pool
     ): Boolean {
         val query = "SELECT COUNT(`value`) FROM `${getTablePrefix() + tableName}` where `option` = ?"
 
@@ -83,14 +84,14 @@ class SystemPropertyDaoImpl : SystemPropertyDao() {
             .execute(
                 Tuple.of(systemProperty.option)
             )
-            .await()
+            .coAwait()
 
         return rows.toList()[0].getLong(0) != 0L
     }
 
     override suspend fun getValue(
         systemProperty: SystemProperty,
-        jdbcPool: JDBCPool
+        jdbcPool: Pool
     ): SystemProperty? {
         val query = "SELECT `id`, `option`, `value` FROM `${getTablePrefix() + tableName}` where `option` = ?"
 
@@ -101,7 +102,7 @@ class SystemPropertyDaoImpl : SystemPropertyDao() {
                     systemProperty.option
                 )
             )
-            .await()
+            .coAwait()
 
         if (rows.size() == 0) {
             return null
@@ -112,20 +113,20 @@ class SystemPropertyDaoImpl : SystemPropertyDao() {
         return row.toEntity()
     }
 
-    override suspend fun getAll(jdbcPool: JDBCPool): List<SystemProperty> {
+    override suspend fun getAll(jdbcPool: Pool): List<SystemProperty> {
         val query =
             "SELECT `id`, `option`, `value` FROM `${getTablePrefix() + tableName}`"
 
         val rows: RowSet<Row> = jdbcPool
             .preparedQuery(query)
             .execute()
-            .await()
+            .coAwait()
 
         return rows.toEntities()
     }
 
     private suspend fun addWebsiteConfig(
-        jdbcPool: JDBCPool
+        jdbcPool: Pool
     ) {
         SystemPropertyDefaults.entries.forEach {
             add(SystemProperty(option = it.name, value = it.value), jdbcPool)
