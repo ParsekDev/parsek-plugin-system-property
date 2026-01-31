@@ -16,6 +16,7 @@ version =
 val pf4jVersion: String by project
 val vertxVersion: String by project
 val handlebarsVersion: String by project
+val springContextVersion: String by project
 val bootstrap = (project.findProperty("bootstrap") as String?)?.toBoolean() ?: false
 val pluginsDir: File? by rootProject.extra
 
@@ -40,6 +41,9 @@ dependencies {
     compileOnly("io.vertx:vertx-lang-kotlin:$vertxVersion")
     compileOnly("io.vertx:vertx-lang-kotlin-coroutines:$vertxVersion")
     compileOnly("io.vertx:vertx-jdbc-client:$vertxVersion")
+    
+    // https://mvnrepository.com/artifact/org.springframework/spring-context
+    compileOnly("org.springframework:spring-context:$springContextVersion")
 }
 
 tasks {
@@ -57,11 +61,11 @@ tasks {
         val pluginDependencies: String by project
 
         manifest {
-            attributes["Plugin-Class"] = pluginClass
-            attributes["Plugin-Id"] = pluginId
-            attributes["Plugin-Version"] = version
-            attributes["Plugin-Provider"] = pluginProvider
-            attributes["Plugin-Dependencies"] = pluginDependencies
+            attributes["main-class"] = pluginClass
+            attributes["id"] = pluginId
+            attributes["version"] = version
+            attributes["developer"] = pluginProvider
+            attributes["dependencies"] = pluginDependencies
         }
 
         if (version != "unspecified") {

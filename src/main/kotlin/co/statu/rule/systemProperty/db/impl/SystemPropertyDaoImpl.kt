@@ -1,16 +1,22 @@
 package co.statu.rule.systemProperty.db.impl
 
 import co.statu.parsek.api.ParsekPlugin
+import co.statu.rule.database.annotation.Dao
 import co.statu.rule.systemProperty.SystemPropertyDefaults
 import co.statu.rule.systemProperty.db.dao.SystemPropertyDao
 import co.statu.rule.systemProperty.db.model.SystemProperty
-import io.vertx.jdbcclient.JDBCPool
 import io.vertx.sqlclient.Pool
 import io.vertx.kotlin.coroutines.*
 import io.vertx.sqlclient.Row
 import io.vertx.sqlclient.RowSet
 import io.vertx.sqlclient.Tuple
+import org.springframework.beans.factory.config.ConfigurableBeanFactory
+import org.springframework.context.annotation.Lazy
+import org.springframework.context.annotation.Scope
 
+@Dao
+@Lazy
+@Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 class SystemPropertyDaoImpl : SystemPropertyDao() {
 
     override suspend fun init(jdbcPool: Pool, plugin: ParsekPlugin) {

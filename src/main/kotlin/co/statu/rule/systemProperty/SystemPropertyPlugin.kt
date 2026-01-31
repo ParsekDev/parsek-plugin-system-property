@@ -1,14 +1,14 @@
 package co.statu.rule.systemProperty
 
 import co.statu.parsek.api.ParsekPlugin
-import co.statu.rule.database.Dao
-import co.statu.rule.database.DatabaseMigration
-import co.statu.rule.database.api.DatabaseHelper
-import co.statu.rule.systemProperty.db.impl.SystemPropertyDaoImpl
+import co.statu.rule.database.DatabaseManager
+import org.springframework.beans.factory.getBean
 
-class SystemPropertyPlugin : ParsekPlugin(), DatabaseHelper {
-    override val tables: List<Dao<*>> = listOf(SystemPropertyDaoImpl())
+class SystemPropertyPlugin : ParsekPlugin() {
+    override suspend fun onStart() {
+        val databaseManager = pluginGlobalBeanContext.beanFactory.getBean<DatabaseManager>()
 
-    override val migrations: List<DatabaseMigration> = listOf()
+        databaseManager.initialize(this)
+    }
 }
 
